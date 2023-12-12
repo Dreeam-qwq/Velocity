@@ -75,7 +75,9 @@ public final class InitialInboundConnection implements VelocityInboundConnection
 
   @Override
   public String toString() {
-    return "[initial connection] " + connection.getRemoteAddress().toString();
+    return "[initial connection] "
+            + (connection.getRemoteAddress() != null
+            ? connection.getRemoteAddress().toString() : "<NULL IP>");
   }
 
   @Override
