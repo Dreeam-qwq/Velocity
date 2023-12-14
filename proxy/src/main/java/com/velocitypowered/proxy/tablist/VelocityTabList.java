@@ -72,11 +72,6 @@ public class VelocityTabList implements InternalTabList {
   }
 
   @Override
-  public Player getPlayer() {
-    return player;
-  }
-
-  @Override
   public void setHeaderAndFooter(Component header, Component footer) {
     Preconditions.checkNotNull(header, "header");
     Preconditions.checkNotNull(footer, "footer");
