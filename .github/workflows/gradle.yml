@@ -20,3 +20,12 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
+
+    - name: Upload velocity
+      uses: marvinpinto/action-automatic-releases@master
+      with:
+        title: "velocity"
+        automatic_release_tag: "build"
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        files: "*/build/libs/*.jar"
+        prerelease: true
