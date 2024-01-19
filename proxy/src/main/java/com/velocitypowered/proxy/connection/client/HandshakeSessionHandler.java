@@ -92,8 +92,6 @@ public class HandshakeSessionHandler implements MinecraftSessionHandler {
       LOGGER.error("Received an invalid protocol!");
       connection.close(true);
     } else {
-      InitialInboundConnection ic = new InitialInboundConnection(connection,
-              cleanVhost(handshake.getServerAddress()), handshake);
       connection.setProtocolVersion(handshake.getProtocolVersion());
       connection.setAssociation(ic);
 
