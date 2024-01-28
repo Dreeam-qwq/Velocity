@@ -398,6 +398,10 @@ public class VelocityConfiguration implements ProxyConfig {
     return advanced.isLogPlayerConnections();
   }
 
+  public boolean isAllowIllegalCharactersInChat() {
+    return advanced.allowIllegalCharactersInChat;
+  }
+
   public boolean isForceKeyAuthentication() {
     return forceKeyAuthentication;
   }
@@ -708,6 +712,8 @@ public class VelocityConfiguration implements ProxyConfig {
     private boolean logCommandExecutions = false;
     @Expose
     private boolean logPlayerConnections = true;
+    @Expose
+    private boolean allowIllegalCharactersInChat = true;
 
     private Advanced() {
     }
@@ -732,6 +738,8 @@ public class VelocityConfiguration implements ProxyConfig {
         this.announceProxyCommands = config.getOrElse("announce-proxy-commands", true);
         this.logCommandExecutions = config.getOrElse("log-command-executions", false);
         this.logPlayerConnections = config.getOrElse("log-player-connections", true);
+        this.allowIllegalCharactersInChat = config
+                .getOrElse("allow-illegal-characters-in-chat", true);
       }
     }
 
@@ -791,6 +799,10 @@ public class VelocityConfiguration implements ProxyConfig {
       return logPlayerConnections;
     }
 
+    public boolean isAllowIllegalCharactersInChat() {
+      return allowIllegalCharactersInChat;
+    }
+
     @Override
     public String toString() {
       return "Advanced{"
@@ -807,6 +819,7 @@ public class VelocityConfiguration implements ProxyConfig {
           + ", announceProxyCommands=" + announceProxyCommands
           + ", logCommandExecutions=" + logCommandExecutions
           + ", logPlayerConnections=" + logPlayerConnections
+          + ", allowIllegalCharactersInChat=" + allowIllegalCharactersInChat
           + '}';
     }
   }

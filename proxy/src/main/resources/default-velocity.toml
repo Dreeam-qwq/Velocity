@@ -141,6 +141,9 @@ log-command-executions = false
 # and disconnecting from the proxy.
 log-player-connections = true
 
+# Enables to allow players send illegal characters in the chat, like §.
+allow-illegal-characters-in-chat = true
+
 [query]
 # Whether to enable responding to GameSpy 4 query responses or not.
 enabled = false
