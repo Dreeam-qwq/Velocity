@@ -166,11 +166,9 @@ public class IdentifiedKeyImpl implements IdentifiedKey {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof IdentifiedKey)) {
+    if (!(o instanceof final IdentifiedKey that)) {
       return false;
     }
-
-    IdentifiedKey that = (IdentifiedKey) o;
 
     return Objects.equal(this.getSignedPublicKey(), that.getSignedPublicKey())
         && Objects.equal(this.getExpiryTemporal(), that.getExpiryTemporal())
