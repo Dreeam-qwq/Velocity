@@ -69,6 +69,7 @@ import com.velocitypowered.proxy.protocol.packet.RemoveResourcePackPacket;
 import com.velocitypowered.proxy.protocol.packet.chat.ChatQueue;
 import com.velocitypowered.proxy.protocol.packet.chat.ChatType;
 import com.velocitypowered.proxy.protocol.packet.chat.ComponentHolder;
+import com.velocitypowered.proxy.protocol.packet.chat.PlayerChatCompletionPacket;
 import com.velocitypowered.proxy.protocol.packet.chat.builder.ChatBuilderFactory;
 import com.velocitypowered.proxy.protocol.packet.chat.legacy.LegacyChatPacket;
 import com.velocitypowered.proxy.protocol.packet.config.StartUpdatePacket;
@@ -605,7 +606,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
       logger.info(Component.text(this + " has disconnected: ").append(translated));
     }
     connection.closeWith(DisconnectPacket.create(translated,
-            this.getProtocolVersion(), duringLogin));
+            this.getProtocolVersion(), connection.getState()));
   }
 
   public @Nullable VelocityServerConnection getConnectedServer() {
@@ -774,7 +775,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
                   Component reason = status.getReasonComponent()
                       .orElse(ConnectionMessages.INTERNAL_SERVER_CONNECTION_ERROR);
                   handleConnectionException(res.getServer(),
-                      DisconnectPacket.create(reason, getProtocolVersion(), false),
+                      DisconnectPacket.create(reason, getProtocolVersion(), connection.getState()),
                       ((Impl) status).isSafe());
                   break;
                 case SUCCESS:
@@ -964,6 +965,31 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
   }
 
   @Override
+  public void addCustomChatCompletions(@NotNull Collection<String> completions) {
+    Preconditions.checkNotNull(completions, "completions");
+    this.sendCustomChatCompletionPacket(completions, PlayerChatCompletionPacket.Action.ADD);
+  }
+
+  @Override
+  public void removeCustomChatCompletions(@NotNull Collection<String> completions) {
+    Preconditions.checkNotNull(completions, "completions");
+    this.sendCustomChatCompletionPacket(completions, PlayerChatCompletionPacket.Action.REMOVE);
+  }
+
+  @Override
+  public void setCustomChatCompletions(@NotNull Collection<String> completions) {
+    Preconditions.checkNotNull(completions, "completions");
+    this.sendCustomChatCompletionPacket(completions, PlayerChatCompletionPacket.Action.SET);
+  }
+
+  private void sendCustomChatCompletionPacket(@NotNull Collection<String> completions,
+                                              PlayerChatCompletionPacket.Action action) {
+    if (connection.getProtocolVersion().noLessThan(ProtocolVersion.MINECRAFT_1_19_1)) {
+      connection.write(new PlayerChatCompletionPacket(completions.toArray(new String[0]), action));
+    }
+  }
+
+  @Override
   public void spoofChatInput(String input) {
     Preconditions.checkArgument(input.length() <= LegacyChatPacket.MAX_SERVERBOUND_MESSAGE_LENGTH,
         "input cannot be greater than " + LegacyChatPacket.MAX_SERVERBOUND_MESSAGE_LENGTH
@@ -1003,6 +1029,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
 
   @Override
   public void sendResourcePackOffer(ResourcePackInfo packInfo) {
+    this.resourcePackHandler.checkAlreadyAppliedPack(packInfo.getHash());
     if (this.getProtocolVersion().noLessThan(ProtocolVersion.MINECRAFT_1_8)) {
       Preconditions.checkNotNull(packInfo, "packInfo");
       this.resourcePackHandler.queueResourcePack(packInfo);
@@ -1251,7 +1278,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
             Component reason = status.getReasonComponent()
                 .orElse(ConnectionMessages.INTERNAL_SERVER_CONNECTION_ERROR);
             handleConnectionException(toConnect,
-                DisconnectPacket.create(reason, getProtocolVersion(), false), status.isSafe());
+                DisconnectPacket.create(reason, getProtocolVersion(), connection.getState()), status.isSafe());
             break;
           default:
             // The only remaining value is successful (no need to do anything!)
