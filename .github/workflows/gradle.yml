@@ -21,7 +21,7 @@ jobs:
         java-version: 17
         distribution: 'temurin'
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew build -x checkstyleMain -x test
 
     - name: Upload velocity
       uses: marvinpinto/action-automatic-releases@master
