@@ -230,6 +230,11 @@ public class VelocityConfiguration implements ProxyConfig {
       valid = false;
     }
 
+    if (advanced.commandRateLimit < 0) {
+      logger.error("Invalid command rate limit {}", advanced.commandRateLimit);
+      valid = false;
+    }
+
     loadFavicon();
 
     return valid;
@@ -349,6 +354,31 @@ public class VelocityConfiguration implements ProxyConfig {
   @Override
   public int getReadTimeout() {
     return advanced.getReadTimeout();
+  }
+
+  @Override
+  public int getCommandRatelimit() {
+    return advanced.getCommandRateLimit();
+  }
+
+  @Override
+  public int getTabCompleteRatelimit() {
+    return advanced.getTabCompleteRateLimit();
+  }
+
+  @Override
+  public int getKickAfterRateLimitedTabCompletes() {
+    return advanced.getKickAfterRateLimitedTabCompletes();
+  }
+
+  @Override
+  public boolean isCancelCommandsIfRateLimited() {
+    return advanced.isCancelCommandsIfRateLimited();
+  }
+
+  @Override
+  public int getKickAfterRateLimitedCommands() {
+    return advanced.getKickAfterRateLimitedCommands();
   }
 
   public boolean isProxyProtocol() {
@@ -727,6 +757,16 @@ public class VelocityConfiguration implements ProxyConfig {
     @Expose
     private boolean enableReusePort = false;
     @Expose
+    private int commandRateLimit = 50;
+    @Expose
+    private boolean cancelCommandsIfRateLimited = true;
+    @Expose
+    private int kickAfterRateLimitedCommands = 5;
+    @Expose
+    private int tabCompleteRateLimit = 50;
+    @Expose
+    private int kickAfterRateLimitedTabCompletes = 10;
+    @Expose
     private boolean allowIllegalCharactersInChat = true;
 
     private Advanced() {
@@ -754,6 +794,11 @@ public class VelocityConfiguration implements ProxyConfig {
         this.logPlayerConnections = config.getOrElse("log-player-connections", true);
         this.acceptTransfers = config.getOrElse("accepts-transfers", false);
         this.enableReusePort = config.getOrElse("enable-reuse-port", false);
+        this.commandRateLimit = config.getIntOrElse("command-rate-limit", 50);
+        this.cancelCommandsIfRateLimited = config.getOrElse("cancel-commands-if-rate-limited", true);
+        this.kickAfterRateLimitedCommands = config.getIntOrElse("kick-after-rate-limited-commands", 5);
+        this.tabCompleteRateLimit = config.getIntOrElse("tab-complete-rate-limit", 25); // very lenient
+        this.kickAfterRateLimitedTabCompletes = config.getIntOrElse("kick-after-rate-limited-tab-completes", 10);
         this.allowIllegalCharactersInChat = config
                 .getOrElse("allow-illegal-characters-in-chat", true);
       }
@@ -821,6 +866,26 @@ public class VelocityConfiguration implements ProxyConfig {
 
     public boolean isEnableReusePort() {
       return enableReusePort;
+    }
+
+    public int getCommandRateLimit() {
+      return commandRateLimit;
+    }
+
+    public boolean isCancelCommandsIfRateLimited() {
+      return cancelCommandsIfRateLimited;
+    }
+
+    public int getKickAfterRateLimitedCommands() {
+      return kickAfterRateLimitedCommands;
+    }
+
+    public int getTabCompleteRateLimit() {
+      return tabCompleteRateLimit;
+    }
+
+    public int getKickAfterRateLimitedTabCompletes() {
+      return kickAfterRateLimitedTabCompletes;
     }
 
     public boolean isAllowIllegalCharactersInChat() {
