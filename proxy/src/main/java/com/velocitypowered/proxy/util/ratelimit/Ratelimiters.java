@@ -29,8 +29,8 @@ public final class Ratelimiters {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> Ratelimiter<T> createWithMilliseconds(long ms) {
-    return ms <= 0 ? (Ratelimiter<T>) NoopCacheRatelimiter.INSTANCE : new CaffeineCacheRatelimiter(ms,
+  public static <T> Ratelimiter createWithMilliseconds(long ms) {
+    return ms <= 0 ? (Ratelimiter) NoopCacheRatelimiter.INSTANCE : new CaffeineCacheRatelimiter(ms,
         TimeUnit.MILLISECONDS);
   }
 }
