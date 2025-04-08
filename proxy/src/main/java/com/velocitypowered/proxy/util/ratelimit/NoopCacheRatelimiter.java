@@ -19,8 +19,6 @@ package com.velocitypowered.proxy.util.ratelimit;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.UUID;
-
 /**
  * A {@link Ratelimiter} that does no rate-limiting.
  */
@@ -29,11 +27,6 @@ enum NoopCacheRatelimiter implements Ratelimiter<Object> {
 
   @Override
   public boolean attempt(@NotNull Object key) {
-    return true;
-  }
-
-  @Override
-  public boolean attempt(@NotNull UUID key) {
     return true;
   }
 }

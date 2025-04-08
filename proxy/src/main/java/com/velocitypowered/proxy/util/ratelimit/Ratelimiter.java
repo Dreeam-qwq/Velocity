@@ -25,14 +25,6 @@ import org.jetbrains.annotations.NotNull;
 public interface Ratelimiter<T> {
 
   /**
-   * Determines whether or not to allow the connection.
-   *
-   * @param address the address to rate limit
-   * @return true if allowed, false if not
-   */
-  boolean attempt(InetAddress address);
-
-  /**
   * Attempts to rate-limit the object.
   *
   * @param key the object to rate limit
