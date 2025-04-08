@@ -22,16 +22,13 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Ticker;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
-
-import java.net.InetAddress;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * A simple rate-limiter based on a Caffeine {@link Cache}.
  */
-public class CaffeineCacheRatelimiter<T> implements Ratelimiter {
+public class CaffeineCacheRatelimiter<T> implements Ratelimiter<T> {
 
   private final Cache<T, Long> expiringCache;
   private final long timeoutNanos;
@@ -52,29 +49,15 @@ public class CaffeineCacheRatelimiter<T> implements Ratelimiter {
   }
 
   /**
-   * Attempts to rate-limit the client.
+   * Attempts to rate-limit the object.
    *
-   * @param address the address to rate limit
-   * @return true if we should allow the client, false if we should rate-limit
-   */
-  @Override
-  public boolean attempt(InetAddress address) {
-    Preconditions.checkNotNull(address, "address");
-    long expectedNewValue = System.nanoTime() + timeoutNanos;
-    long last = expiringCache.get((T) address, address1 -> expectedNewValue);
-    return expectedNewValue == last;
-  }
-
-  /**
-   * Attempts to rate-limit the player uuid.
-   *
-   * @param uuid the player uuid to rate limit
+   * @param key the object to rate limit
    * @return true if we should allow the object, false if we should rate-limit
    */
   @Override
-  public boolean attempt(@NotNull UUID uuid) {
+  public boolean attempt(@NotNull  T key) {
     long expectedNewValue = System.nanoTime() + timeoutNanos;
-    long last = expiringCache.get((T) uuid, key -> expectedNewValue);
+    long last = expiringCache.get(key, (key1) -> expectedNewValue);
     return expectedNewValue == last;
   }
 }

@@ -78,6 +78,8 @@ public class VelocityConfiguration implements ProxyConfig {
   private boolean onlineModeKickExistingPlayers = false;
   @Expose
   private PingPassthroughMode pingPassthrough = PingPassthroughMode.DISABLED;
+  @Expose
+  private boolean samplePlayersInPing = false;
   private final Servers servers;
   private final ForcedHosts forcedHosts;
   @Expose
@@ -105,8 +107,9 @@ public class VelocityConfiguration implements ProxyConfig {
       boolean preventClientProxyConnections, boolean announceForge,
       PlayerInfoForwarding playerInfoForwardingMode, byte[] forwardingSecret,
       boolean onlineModeKickExistingPlayers, PingPassthroughMode pingPassthrough,
-      boolean enablePlayerAddressLogging, Servers servers, ForcedHosts forcedHosts,
-      Advanced advanced, Query query, Metrics metrics, boolean forceKeyAuthentication) {
+      boolean samplePlayersInPing, boolean enablePlayerAddressLogging, Servers servers,
+      ForcedHosts forcedHosts, Advanced advanced, Query query, Metrics metrics,
+      boolean forceKeyAuthentication) {
     this.bind = bind;
     this.motd = motd;
     this.showMaxPlayers = showMaxPlayers;
@@ -117,6 +120,7 @@ public class VelocityConfiguration implements ProxyConfig {
     this.forwardingSecret = forwardingSecret;
     this.onlineModeKickExistingPlayers = onlineModeKickExistingPlayers;
     this.pingPassthrough = pingPassthrough;
+    this.samplePlayersInPing = samplePlayersInPing;
     this.enablePlayerAddressLogging = enablePlayerAddressLogging;
     this.servers = servers;
     this.forcedHosts = forcedHosts;
@@ -372,8 +376,8 @@ public class VelocityConfiguration implements ProxyConfig {
   }
 
   @Override
-  public boolean isCancelCommandsIfRateLimited() {
-    return advanced.isCancelCommandsIfRateLimited();
+  public boolean isForwardCommandsIfRateLimited() {
+    return advanced.isForwardCommandsIfRateLimited();
   }
 
   @Override
@@ -399,6 +403,10 @@ public class VelocityConfiguration implements ProxyConfig {
 
   public PingPassthroughMode getPingPassthrough() {
     return pingPassthrough;
+  }
+
+  public boolean getSamplePlayersInPing() {
+    return samplePlayersInPing;
   }
 
   public boolean isPlayerAddressLoggingEnabled() {
@@ -541,6 +549,8 @@ public class VelocityConfiguration implements ProxyConfig {
       final PingPassthroughMode pingPassthroughMode = config.getEnumOrElse("ping-passthrough",
               PingPassthroughMode.DISABLED);
 
+      final boolean samplePlayersInPing = config.getOrElse("sample-players-in-ping", false);
+
       final String bind = config.getOrElse("bind", "0.0.0.0:25565");
       final int maxPlayers = config.getIntOrElse("show-max-players", 500);
       final boolean onlineMode = config.getOrElse("online-mode", true);
@@ -571,6 +581,7 @@ public class VelocityConfiguration implements ProxyConfig {
               forwardingSecret,
               kickExisting,
               pingPassthroughMode,
+              samplePlayersInPing,
               enablePlayerAddressLogging,
               new Servers(serversConfig),
               new ForcedHosts(forcedHostsConfig),
@@ -759,7 +770,7 @@ public class VelocityConfiguration implements ProxyConfig {
     @Expose
     private int commandRateLimit = 50;
     @Expose
-    private boolean cancelCommandsIfRateLimited = true;
+    private boolean forwardCommandsIfRateLimited = true;
     @Expose
     private int kickAfterRateLimitedCommands = 5;
     @Expose
@@ -794,11 +805,11 @@ public class VelocityConfiguration implements ProxyConfig {
         this.logPlayerConnections = config.getOrElse("log-player-connections", true);
         this.acceptTransfers = config.getOrElse("accepts-transfers", false);
         this.enableReusePort = config.getOrElse("enable-reuse-port", false);
-        this.commandRateLimit = config.getIntOrElse("command-rate-limit", 50);
-        this.cancelCommandsIfRateLimited = config.getOrElse("cancel-commands-if-rate-limited", true);
-        this.kickAfterRateLimitedCommands = config.getIntOrElse("kick-after-rate-limited-commands", 5);
-        this.tabCompleteRateLimit = config.getIntOrElse("tab-complete-rate-limit", 25); // very lenient
-        this.kickAfterRateLimitedTabCompletes = config.getIntOrElse("kick-after-rate-limited-tab-completes", 10);
+        this.commandRateLimit = config.getIntOrElse("command-rate-limit", 25);
+        this.forwardCommandsIfRateLimited = config.getOrElse("forward-commands-if-rate-limited", true);
+        this.kickAfterRateLimitedCommands = config.getIntOrElse("kick-after-rate-limited-commands", 0);
+        this.tabCompleteRateLimit = config.getIntOrElse("tab-complete-rate-limit", 10); // very lenient
+        this.kickAfterRateLimitedTabCompletes = config.getIntOrElse("kick-after-rate-limited-tab-completes", 0);
         this.allowIllegalCharactersInChat = config
                 .getOrElse("allow-illegal-characters-in-chat", true);
       }
@@ -872,8 +883,8 @@ public class VelocityConfiguration implements ProxyConfig {
       return commandRateLimit;
     }
 
-    public boolean isCancelCommandsIfRateLimited() {
-      return cancelCommandsIfRateLimited;
+    public boolean isForwardCommandsIfRateLimited() {
+      return forwardCommandsIfRateLimited;
     }
 
     public int getKickAfterRateLimitedCommands() {

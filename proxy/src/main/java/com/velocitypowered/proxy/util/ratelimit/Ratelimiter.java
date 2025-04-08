@@ -19,13 +19,10 @@ package com.velocitypowered.proxy.util.ratelimit;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.net.InetAddress;
-import java.util.UUID;
-
 /**
  * Allows rate limiting of objects.
  */
-public interface Ratelimiter {
+public interface Ratelimiter<T> {
 
   /**
    * Determines whether or not to allow the connection.
@@ -36,10 +33,10 @@ public interface Ratelimiter {
   boolean attempt(InetAddress address);
 
   /**
-  * ADetermines whether or not to allow the connection.
+  * Attempts to rate-limit the object.
   *
-  * @param uuid the player uuid to rate limit
+  * @param key the object to rate limit
   * @return true if we should allow the object, false if we should rate-limit
   */
-  boolean attempt(@NotNull UUID uuid);
+  boolean attempt(@NotNull T key);
 }

@@ -312,6 +312,7 @@ public class ClientPlaySessionHandler implements MinecraftSessionHandler {
             + "ready. Channel: {}. Packet discarded.", packet.getChannel());
       } else if (PluginMessageUtil.isRegister(packet)) {
         List<String> channels = PluginMessageUtil.getChannels(packet);
+        player.getClientsideChannels().addAll(channels);
         List<ChannelIdentifier> channelIdentifiers = new ArrayList<>();
         for (String channel : channels) {
           try {
@@ -325,6 +326,7 @@ public class ClientPlaySessionHandler implements MinecraftSessionHandler {
                 new PlayerChannelRegisterEvent(player, ImmutableList.copyOf(channelIdentifiers)));
         backendConn.write(packet.retain());
       } else if (PluginMessageUtil.isUnregister(packet)) {
+        player.getClientsideChannels().removeAll(PluginMessageUtil.getChannels(packet));
         backendConn.write(packet.retain());
       } else if (PluginMessageUtil.isMcBrand(packet)) {
         String brand = PluginMessageUtil.readBrandMessage(packet.content());
@@ -593,6 +595,10 @@ public class ClientPlaySessionHandler implements MinecraftSessionHandler {
     if (!channels.isEmpty()) {
       serverMc.delayedWrite(constructChannelsPacket(serverVersion, channels));
     }
+    // Tell the server about this client's plugin message channels.
+    if (!player.getClientsideChannels().isEmpty()) {
+      serverMc.delayedWrite(constructChannelsPacket(serverVersion, player.getClientsideChannels()));
+    }
 
     // If we had plugin messages queued during login/FML handshake, send them now.
     PluginMessagePacket pm;
@@ -682,6 +688,8 @@ public class ClientPlaySessionHandler implements MinecraftSessionHandler {
 
       return true;
     }
+
+    failedTabCompleteAttempts = 0;
 
     server.getCommandManager().offerBrigadierSuggestions(player, command)
         .thenAcceptAsync(suggestions -> {
