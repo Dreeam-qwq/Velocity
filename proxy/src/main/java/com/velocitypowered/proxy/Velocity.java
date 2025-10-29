@@ -41,6 +41,10 @@ public class Velocity {
     // How inconvenient. Force AWT to work with its head chopped off.
     System.setProperty("java.awt.headless", "true");
 
+    // Revert to old console provider, Fix https://github.com/PaperMC/Paper/issues/10405
+    // Solution refers to https://inside.java/2023/07/31/quality-heads-up
+    System.setProperty("jdk.console", "java.base");
+
     // If Velocity's natives are being extracted to a different temporary directory, make sure the
     // Netty natives are extracted there as well
     if (VelocityProperties.hasProperty("velocity.natives-tmpdir")) {
