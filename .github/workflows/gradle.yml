@@ -24,10 +24,10 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build -x checkstyleMain -x test
 
-    - name: Prepare release
+    - name: Prepare for the release
       run: |
-        if git show-ref --tags build --quiet; then
-          gh release delete build --cleanup-tag
+        if git show-ref --tags latest --quiet; then
+          gh release delete latest --cleanup-tag
         fi
         echo "🚀Ready for release"
       env:
@@ -37,7 +37,7 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         name: "Velocity"
-        tag_name: "build"
+        tag_name: "latest"
         files: "*/build/libs/*.jar"
         token: "${{ secrets.GITHUB_TOKEN }}"
         target_commitish: "${{ github.sha }}"
