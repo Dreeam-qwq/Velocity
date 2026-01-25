@@ -25,7 +25,11 @@ jobs:
       run: ./gradlew build -x checkstyleMain -x test
 
     - name: Prepare for the release
-      run: gh release delete latest --cleanup-tag
+      run: |
+        if git show-ref --tags latest --quiet; then
+          gh release delete latest --cleanup-tag
+        fi
+        echo "🚀Ready for release"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
