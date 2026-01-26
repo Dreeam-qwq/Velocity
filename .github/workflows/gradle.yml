@@ -26,14 +26,11 @@ jobs:
 
     - name: Prepare for the release
       run: |
-        if git show-ref --tags latest --quiet; then
-        {
-          gh release delete latest --cleanup-tag
-        }
-        fi
-        echo "🚀Ready for release"
+          chmod +x ./scripts/prepareRelease.sh
+          ./scripts/prepareRelease.sh
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_REPO: ${{ github.repository }}
 
     - name: Upload Velocity
       uses: softprops/action-gh-release@v2
