@@ -27,7 +27,9 @@ jobs:
     - name: Prepare for the release
       run: |
         if git show-ref --tags latest --quiet; then
+        {
           gh release delete latest --cleanup-tag
+        }
         fi
         echo "🚀Ready for release"
       env:
