@@ -32,14 +32,23 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_REPO: ${{ github.repository }}
 
-    - name: Upload Velocity
-      uses: softprops/action-gh-release@v2
+    - name: Upload Velocity api javadoc
+      uses: actions/upload-artifact@v7
       with:
-        name: "Velocity"
-        tag_name: "latest"
-        files: "*/build/libs/*.jar"
-        token: "${{ secrets.GITHUB_TOKEN }}"
-        target_commitish: "${{ github.sha }}"
-        generate_release_notes: true
-        draft: false
-        prerelease: true
+        path: api/build/libs/velocity-api-*-SNAPSHOT-javadoc.jar
+        archive: false
+    - name: Upload Velocity api
+      uses: actions/upload-artifact@v7
+      with:
+        path: api/build/libs/velocity-api-*-SNAPSHOT.jar
+        archive: false
+    - name: Upload Velocity native
+      uses: actions/upload-artifact@v7
+      with:
+        path: native/build/libs/velocity-native-*-SNAPSHOT.jar
+        archive: false
+    - name: Upload Velocity
+      uses: actions/upload-artifact@v7
+      with:
+        path: proxy/build/libs/velocity-proxy-*-SNAPSHOT-all.jar
+        archive: false
