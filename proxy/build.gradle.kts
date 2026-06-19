@@ -154,8 +154,7 @@ dependencies {
 
     implementation(libs.jopt)
     implementation(libs.terminalconsoleappender)
-    runtimeOnly(libs.jline.ffm)
-    runtimeOnly(libs.jline.jni)
+    runtimeOnly(libs.jline)
     runtimeOnly(libs.disruptor)
     implementation(libs.fastutil)
     implementation(platform(libs.adventure.bom))
